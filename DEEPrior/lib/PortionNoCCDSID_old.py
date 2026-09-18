@@ -61,16 +61,7 @@ class PortionNoCCDSID:
 
             # only if decoded has a content
             if len(decoded) != 0:
-                protein_coding_genes = [
-                    gene for gene in decoded
-                    if gene.get('biotype') == 'protein_coding'
-                ]
-
-                if len(protein_coding_genes) != 0:
-                    self.genes.append(GeneNoCCDSID(protein_coding_genes[0]))
-                else:
-                    self.genes.append(GeneNoCCDSID(decoded[0]))
-
+                self.genes.append(GeneNoCCDSID(decoded[0]))
                 self.ensg = self.genes[0].ensg
                 self.common_name = self.genes[0].common_name
                 self.biotype = self.genes[0].biotype
@@ -225,7 +216,7 @@ class PortionNoCCDSID:
                 req = list(PortionNoCCDSID.chunks(query, 50))
                 sequence = ''
                 for j in req:
-                    a = PortionNoCCDSID.request_post_ensembl(', '.join(j), self.version)
+                    a = PortionNoCCDSID.request_post_ensembl(', '.join(j), 'grch37')
                     if a != '':
                         sequence += a
                     else:
@@ -246,7 +237,7 @@ class PortionNoCCDSID:
         # Create a function called "chunks" with two arguments, l and n:
         # For item i in a range that is a length of l,
         for i in range(0, len(l), n):
-            # Create an index range of l of n items:
+            # Create an index range for l of n items:
             yield l[i:i+n]
 
     @staticmethod
@@ -254,6 +245,7 @@ class PortionNoCCDSID:
         """
         This method can accept a maximum of 50 post sequences
         :param query_string: MUST be in the format: '"X:1000000..1000100:1", "ABBA01004489.1:1..100"'
+        :param version: grch37 or grch38. grch38 is the default parameter
         :return: dna sequence in the requested DNA regions
         """
         if version == 'grch37':
